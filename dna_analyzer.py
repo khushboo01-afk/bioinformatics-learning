@@ -1,6 +1,6 @@
 from read_fasta import read_fasta
 def validate_dna(sequence):
-    sequence = sequence.strip()
+    sequence = sequence.strip().upper()
 
     if not sequence:
         return False
@@ -11,7 +11,7 @@ def validate_dna(sequence):
     return True 
 
 def count_nucleotide(sequence):
-    sequence = sequence.strip()
+    sequence = sequence.strip().upper()
 
     count = {
         "A" : sequence.count("A"),
@@ -90,6 +90,10 @@ def analyze_dna(sequence,motif):
          print("ERROR : Invalid  DNA sequence.")
          return None
 
+     if not motif.strip():
+         print("ERROR: DNA motif cannot be empty.")
+         return None
+     
      if not validate_dna(motif):
               print("ERROR : Invalid  DNA motif.")
               return None
@@ -105,36 +109,42 @@ def analyze_dna(sequence,motif):
         "Motif count":len(find_motif(sequence,motif))
     }
      return results
+if __name__ =="__main__":
+    fasta_sequence = read_fasta("sample.fasta")
 
-fasta_sequence = read_fasta("sample.fasta")
-if not fasta_sequence:
-    print("ERROR: No sequences found in FASTA file.")
-else:    
-    print("Available sequences.")
-    for header in fasta_sequence:
-        print(header)
-    selected_header = input("Enter the sequence name you want to analyze.")    
-    if selected_header in fasta_sequence:
-        sequence = fasta_sequence[selected_header]
+    if fasta_sequence is None:
+        print("ERROR: Could not read the FASTA file.")
+    elif not fasta_sequence:
+     print("ERROR:No sequences found in FASTA file.")    
+    else:    
+        print("Available sequences.")
+        for header in fasta_sequence:
+            print(header)
+        selected_header = input("Enter the sequence name you want to analyze.")    
+        if selected_header in fasta_sequence:
+            sequence = fasta_sequence[selected_header]
 
-        print("Selected DNA sequence: ",sequence)
-        if not validate_dna(sequence):
-            print("ERROR: Invalid DNA sequence.")
+            print("Selected DNA sequence: ",sequence)
 
+            if not validate_dna(sequence):
+                print("ERROR: Invalid DNA sequence.")
+
+            else:
+              motif = input("Enter a  DNA motif  to search for: ")
+              report = analyze_dna(sequence,motif)
+            
+            if report is not None:
+                    print("\nDNA SEQUENCE ANALYSIS")
+                    print("---------------------")
+                    print("Sequence:", report["Sequence"])
+                    print("Length:", report["Length"])
+                    print("Nucleotide counts:", report["Nucleotide counts"])
+                    print("GC content:", f'{report["GC content"]:.2f}%')
+                    print("RNA sequence:", report["RNA sequence"])
+                    print("Reverse complement:", report["Reverse complement"])
+                    print("Motif positions",report["Motif positions"])
+                    print("Motif count",report["Motif count"])
+            else:
+                    print("Analysis could not be completed. ")  
         else:
-           motif = input("Enter a  DNA motif  to search for: ")
-
-           report = analyze_dna(sequence,motif)
-           if report is not None:
-                print("\nDNA SEQUENCE ANALYSIS")
-                print("---------------------")
-                print("Sequence:", report["Sequence"])
-                print("Length:", report["Length"])
-                print("Nucleotide counts:", report["Nucleotide counts"])
-                print("GC content:", f'{report["GC content"]:.2f}%')
-                print("RNA sequence:", report["RNA sequence"])
-                print("Reverse complement:", report["Reverse complement"])
-                print("Motif positions",report["Motif positions"])
-                print("Motif count",report["Motif count"])
-           else:
-                print("ERROR :Sequence name not found. ")  
+                print("ERROR: Sequence name not found.")
