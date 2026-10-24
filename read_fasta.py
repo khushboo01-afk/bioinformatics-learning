@@ -1,7 +1,8 @@
-sequences = {}
-header = None
-with open ("sample.fasta","r") as file:
-    for line in file:
+def read_fasta(filename):
+  sequences = {}
+  header = None
+  with open (filename,"r") as file:
+      for line in file:
         line = line.strip()
 
         if not line:
@@ -18,6 +19,9 @@ with open ("sample.fasta","r") as file:
             else:
                 print("WARNING:DNA sequence found prior to header.")
 
-print(sequences)                 
+  return sequences  
 
 
+if __name__ == "__main__":
+    result = read_fasta("sample.fasta")
+    print(result)
